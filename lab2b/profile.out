@@ -1,0 +1,422 @@
+Total: 913 samples
+     817  89.5%  89.5%      913 100.0% listop
+      81   8.9%  98.4%       81   8.9% __strcmp_sse42
+       7   0.8%  99.1%       60   6.6% SortedList_lookup
+       5   0.5%  99.7%       36   3.9% SortedList_insert
+       3   0.3% 100.0%        3   0.3% _init
+       0   0.0% 100.0%      913 100.0% __clone
+       0   0.0% 100.0%      913 100.0% start_thread
+ROUTINE ====================== listop in /u/eng/class/classkrn/cs111/lab2B/lab2_list.c
+   817    913 Total samples (flat / cumulative)
+     .      .   54: {
+     .      .   55:     return (k[0] % n_lists);
+     .      .   56: }
+     .      .   57: 
+     .      .   58: void* listop(void* index)
+---
+     .      .   59: {
+     .      .   60:     struct timespec l_start, l_end;
+     .      .   61:     int num = *((int*)index);
+     .      .   62:     int i;
+     .      .   63:     for(i = num; i < n_ele; i+=n_threads)
+     .      .   64:     {
+     .      .   65:         if (aixinnan == NONE)
+     .      .   66:         {
+     .      .   67:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .   68:         }
+     .      .   69:         else if (aixinnan == MUTEX)
+     .      .   70:         {
+     .      .   71:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .   72:             {
+     .      .   73:                 fprintf(stderr, "error starting a timer. \n");
+     .      .   74:                 exit (1);
+     .      .   75:             }
+     .      .   76:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .   77:             
+     .      .   78:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .   79:             {
+     .      .   80:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .   81:                 exit (1);
+     .      .   82:             }
+     .      .   83:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .   84:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .   85:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .   86:         }
+     .      .   87:         else if (aixinnan == SPIN_LOCK)
+     .      .   88:         {
+     .      .   89:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .   90:             {
+     .      .   91:                 fprintf(stderr, "error starting a timer. \n");
+     .      .   92:                 exit (1);
+     .      .   93:             }
+   443    443   94:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .   95:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .   96:             {
+     .      .   97:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .   98:                 exit (1);
+     .      .   99:             }
+     .      .  100:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .     36  101:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .  102:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  103:         }
+     .      .  104:     }
+     .      .  105:     
+     .      .  106:     int list_length = 0;
+     .      .  107:     
+     .      .  108:     if (aixinnan == NONE)
+     .      .  109:     {
+     .      .  110:         for (i = 0; i < n_lists; i++)
+     .      .  111:      {
+     .      .  112:          int temp = SortedList_length(&listA[i]);
+     .      .  113:          if (temp == -1)
+     .      .  114:          {
+     .      .  115:             fprintf(stderr, "error getting the length of the list. \n");
+     .      .  116:             exit(2);
+     .      .  117:          }
+     .      .  118:          list_length += temp;
+     .      .  119:      }
+     .      .  120:     }
+     .      .  121:     else if (aixinnan == MUTEX)
+     .      .  122:     {
+     .      .  123:         for (i = 0; i < n_lists; i++)
+     .      .  124:         {
+     .      .  125:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  126:             {
+     .      .  127:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  128:                 exit (1);
+     .      .  129:             }
+     .      .  130:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .  131:             
+     .      .  132:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  133:             {
+     .      .  134:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  135:                 exit (1);
+     .      .  136:             }
+     .      .  137:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  138:             int temp = SortedList_length(&listA[i]);
+     .      .  139:             if (temp == -1)
+     .      .  140:             {
+     .      .  141:                 fprintf(stderr, "error getting the length of the list. \n");
+     .      .  142:                 exit(2);
+     .      .  143:             }
+     .      .  144:             list_length += temp;
+     .      .  145:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .  146:         }
+     .      .  147:     }
+     .      .  148:     else if (aixinnan == SPIN_LOCK)
+     .      .  149:     {
+     .      .  150:         for (i = 0; i < n_lists; i++)
+     .      .  151:         {
+     .      .  152:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  153:             {
+     .      .  154:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  155:                 exit (1);
+     .      .  156:             }
+     5      5  157:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .  158:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  159:             {
+     .      .  160:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  161:                 exit (1);
+     .      .  162:             }
+     .      .  163:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  164:             int temp = SortedList_length(&listA[i]);
+     .      .  165:             if (temp == -1)
+     .      .  166:             {
+     .      .  167:                 fprintf(stderr, "error getting the length of the list. \n");
+     .      .  168:                 exit(2);
+     .      .  169:             }
+     .      .  170:             list_length += temp;
+     .      .  171:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  172:         }
+     .      .  173:     }
+     .      .  174:     
+     .      .  175:     SortedListElement_t *temp;
+     .      .  176:     for (i = num; i < n_ele; i+=n_threads)
+     .      .  177:     {
+     .      .  178:         if (aixinnan == NONE)
+     .      .  179:         {
+     .      .  180:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  181:             if (temp == NULL)
+     .      .  182:             {
+     .      .  183:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  184:                 exit(2);
+     .      .  185:             }
+     .      .  186:             if (SortedList_delete(temp))
+     .      .  187:             {
+     .      .  188:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  189:                 exit(2);
+     .      .  190:             }
+     .      .  191:         }
+     .      .  192:         
+     .      .  193:         else if (aixinnan == MUTEX)
+     .      .  194:         {
+     .      .  195:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  196:             {
+     .      .  197:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  198:                 exit (1);
+     .      .  199:             }
+     .      .  200:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .  201:             
+     .      .  202:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  203:             {
+     .      .  204:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  205:                 exit (1);
+     .      .  206:             }
+     .      .  207:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  208:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  209:             if (temp == NULL)
+     .      .  210:             {
+     .      .  211:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  212:                 exit(2);
+     .      .  213:             }
+     .      .  214:             if (SortedList_delete(temp))
+     .      .  215:             {
+     .      .  216:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  217:                 exit(2);
+     .      .  218:             }
+     .      .  219:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .  220:         }
+     .      .  221:         else if (aixinnan == SPIN_LOCK)
+     .      .  222:         {
+     .      .  223:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  224:             {
+     .      .  225:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  226:                 exit (1);
+     .      .  227:             }
+   369    369  228:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .  229:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  230:             {
+     .      .  231:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  232:                 exit (1);
+     .      .  233:             }
+     .      .  234:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .     60  235:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  236:             if (temp == NULL)
+     .      .  237:             {
+     .      .  238:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  239:                 exit(2);
+     .      .  240:             }
+     .      .  241:             if (SortedList_delete(temp))
+     .      .  242:             {
+     .      .  243:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  244:                 exit(2);
+     .      .  245:             }
+     .      .  246:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  247:         }
+     .      .  248:     }
+     .      .  249:     
+     .      .  250:     return NULL;
+     .      .  251: }
+---
+     .      .  252: 
+     .      .  253: 
+     .      .  254: int main(int argc, char * argv[]) {
+     .      .  255:     static struct option long_options[] =
+     .      .  256:     {
+ROUTINE ====================== listop in /u/eng/class/classkrn/cs111/lab2B/lab2_list.c
+   817    913 Total samples (flat / cumulative)
+     .      .   54: {
+     .      .   55:     return (k[0] % n_lists);
+     .      .   56: }
+     .      .   57: 
+     .      .   58: void* listop(void* index)
+---
+     .      .   59: {
+     .      .   60:     struct timespec l_start, l_end;
+     .      .   61:     int num = *((int*)index);
+     .      .   62:     int i;
+     .      .   63:     for(i = num; i < n_ele; i+=n_threads)
+     .      .   64:     {
+     .      .   65:         if (aixinnan == NONE)
+     .      .   66:         {
+     .      .   67:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .   68:         }
+     .      .   69:         else if (aixinnan == MUTEX)
+     .      .   70:         {
+     .      .   71:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .   72:             {
+     .      .   73:                 fprintf(stderr, "error starting a timer. \n");
+     .      .   74:                 exit (1);
+     .      .   75:             }
+     .      .   76:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .   77:             
+     .      .   78:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .   79:             {
+     .      .   80:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .   81:                 exit (1);
+     .      .   82:             }
+     .      .   83:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .   84:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .   85:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .   86:         }
+     .      .   87:         else if (aixinnan == SPIN_LOCK)
+     .      .   88:         {
+     .      .   89:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .   90:             {
+     .      .   91:                 fprintf(stderr, "error starting a timer. \n");
+     .      .   92:                 exit (1);
+     .      .   93:             }
+   443    443   94:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .   95:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .   96:             {
+     .      .   97:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .   98:                 exit (1);
+     .      .   99:             }
+     .      .  100:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .     36  101:             SortedList_insert(&listA[listnum[i]], &ele[i]);
+     .      .  102:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  103:         }
+     .      .  104:     }
+     .      .  105:     
+     .      .  106:     int list_length = 0;
+     .      .  107:     
+     .      .  108:     if (aixinnan == NONE)
+     .      .  109:     {
+     .      .  110:         for (i = 0; i < n_lists; i++)
+     .      .  111:      {
+     .      .  112:          int temp = SortedList_length(&listA[i]);
+     .      .  113:          if (temp == -1)
+     .      .  114:          {
+     .      .  115:             fprintf(stderr, "error getting the length of the list. \n");
+     .      .  116:             exit(2);
+     .      .  117:          }
+     .      .  118:          list_length += temp;
+     .      .  119:      }
+     .      .  120:     }
+     .      .  121:     else if (aixinnan == MUTEX)
+     .      .  122:     {
+     .      .  123:         for (i = 0; i < n_lists; i++)
+     .      .  124:         {
+     .      .  125:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  126:             {
+     .      .  127:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  128:                 exit (1);
+     .      .  129:             }
+     .      .  130:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .  131:             
+     .      .  132:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  133:             {
+     .      .  134:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  135:                 exit (1);
+     .      .  136:             }
+     .      .  137:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  138:             int temp = SortedList_length(&listA[i]);
+     .      .  139:             if (temp == -1)
+     .      .  140:             {
+     .      .  141:                 fprintf(stderr, "error getting the length of the list. \n");
+     .      .  142:                 exit(2);
+     .      .  143:             }
+     .      .  144:             list_length += temp;
+     .      .  145:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .  146:         }
+     .      .  147:     }
+     .      .  148:     else if (aixinnan == SPIN_LOCK)
+     .      .  149:     {
+     .      .  150:         for (i = 0; i < n_lists; i++)
+     .      .  151:         {
+     .      .  152:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  153:             {
+     .      .  154:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  155:                 exit (1);
+     .      .  156:             }
+     5      5  157:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .  158:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  159:             {
+     .      .  160:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  161:                 exit (1);
+     .      .  162:             }
+     .      .  163:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  164:             int temp = SortedList_length(&listA[i]);
+     .      .  165:             if (temp == -1)
+     .      .  166:             {
+     .      .  167:                 fprintf(stderr, "error getting the length of the list. \n");
+     .      .  168:                 exit(2);
+     .      .  169:             }
+     .      .  170:             list_length += temp;
+     .      .  171:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  172:         }
+     .      .  173:     }
+     .      .  174:     
+     .      .  175:     SortedListElement_t *temp;
+     .      .  176:     for (i = num; i < n_ele; i+=n_threads)
+     .      .  177:     {
+     .      .  178:         if (aixinnan == NONE)
+     .      .  179:         {
+     .      .  180:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  181:             if (temp == NULL)
+     .      .  182:             {
+     .      .  183:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  184:                 exit(2);
+     .      .  185:             }
+     .      .  186:             if (SortedList_delete(temp))
+     .      .  187:             {
+     .      .  188:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  189:                 exit(2);
+     .      .  190:             }
+     .      .  191:         }
+     .      .  192:         
+     .      .  193:         else if (aixinnan == MUTEX)
+     .      .  194:         {
+     .      .  195:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  196:             {
+     .      .  197:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  198:                 exit (1);
+     .      .  199:             }
+     .      .  200:             pthread_mutex_lock(&m_zixuan[listnum[i]]);
+     .      .  201:             
+     .      .  202:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  203:             {
+     .      .  204:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  205:                 exit (1);
+     .      .  206:             }
+     .      .  207:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .      .  208:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  209:             if (temp == NULL)
+     .      .  210:             {
+     .      .  211:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  212:                 exit(2);
+     .      .  213:             }
+     .      .  214:             if (SortedList_delete(temp))
+     .      .  215:             {
+     .      .  216:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  217:                 exit(2);
+     .      .  218:             }
+     .      .  219:             pthread_mutex_unlock(&m_zixuan[listnum[i]]);
+     .      .  220:         }
+     .      .  221:         else if (aixinnan == SPIN_LOCK)
+     .      .  222:         {
+     .      .  223:             if (clock_gettime(CLOCK_MONOTONIC, &l_start) == -1)
+     .      .  224:             {
+     .      .  225:                 fprintf(stderr, "error starting a timer. \n");
+     .      .  226:                 exit (1);
+     .      .  227:             }
+   369    369  228:             while(__sync_lock_test_and_set(&spinl[listnum[i]], 1));
+     .      .  229:             if (clock_gettime(CLOCK_MONOTONIC, &l_end) == -1)
+     .      .  230:             {
+     .      .  231:                 fprintf(stderr, "error stopping a timer. \n");
+     .      .  232:                 exit (1);
+     .      .  233:             }
+     .      .  234:             l_time += 1000000000L * (l_end.tv_sec - l_start.tv_sec) + (l_end.tv_nsec - l_start.tv_nsec);
+     .     60  235:             temp = SortedList_lookup(&listA[listnum[i]], ele[i].key);
+     .      .  236:             if (temp == NULL)
+     .      .  237:             {
+     .      .  238:                 fprintf(stderr, "error looking up the element. \n");
+     .      .  239:                 exit(2);
+     .      .  240:             }
+     .      .  241:             if (SortedList_delete(temp))
+     .      .  242:             {
+     .      .  243:                 fprintf(stderr, "error deleting the element. \n");
+     .      .  244:                 exit(2);
+     .      .  245:             }
+     .      .  246:             __sync_lock_release(&spinl[listnum[i]]);
+     .      .  247:         }
+     .      .  248:     }
+     .      .  249:     
+     .      .  250:     return NULL;
+     .      .  251: }
+---
+     .      .  252: 
+     .      .  253: 
+     .      .  254: int main(int argc, char * argv[]) {
+     .      .  255:     static struct option long_options[] =
+     .      .  256:     {
