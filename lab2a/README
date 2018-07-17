@@ -1,0 +1,98 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+
+description:
+lab2_add.c: a C program that implements and tests a shared variable add function
+SortedList.h: a header file  describing the interfaces for linked list operations
+SortedList.c:  a C module that implements insert, delete, lookup, and length methods for a sorted doubly linked list 
+lab2_list.c: a C program that implements and tests the sorted list
+Makefile: supporting five features - build, tests, graphs, dist and clean
+lab2_add.csv: containing all of the results for all of the Part-1 tests
+lab2_list.csv: containing all of the results for all of the Part-2 tests
+lab2_add-1.png:  threads and iterations required to generate a failure (with and without yields)
+lab2_add-2.png: average time per operation with and without yields
+lab2_add-3.png: average time per (single threaded) operation vs. the number of iterations
+lab2_add-4.png:  threads and iterations that can run successfully with yields under each of the synchronization options
+lab2_add-5.png: average time per (protected) operation vs. the number of threads
+lab2_list-1.png: average time per (single threaded) unprotected operation vs. number of iterations (illustrating the correction of the per-operation cost for the list length)
+lab2_list-2.png:  threads and iterations required to generate a failure (with and without yields)
+lab2_list-3.png: iterations that can run (protected) without failure
+lab2_list-4.png: (length-adjusted) cost per operation vs the number of threads for the various synchronization options
+lab2_add.gp: gnuplot data reduction scripts for add
+lab2_list.gp: gnuplot data reduction scripts for list
+
+QUESTION 2.1.1 - causing conflicts
+It takes many iterations before errors are seen because more iterations mean a
+greater chance of race conditions in the critical sections. While increasing 
+the number of iterations, the threads are more likely to be interrupted. Hence,
+we see errors and get bad results. A significantly smaller number of iterations
+so selfom fail due to the reason that although addition to the counter is a 
+quick operation, the operations like creating new threads involve system calls 
+and they take quite a long time. Such time makes the overlapping of critical
+secitions small and thus, with significantly smaller number of iterations, the
+chance of race conditions in the critical sections is significantly reduced.
+We can even see no errors because there can be no parallelism for such a small
+number of iterations. A significantly small number of iterations seldom fail
+because we will not reach critical sections too many times.
+
+QUESTION 2.1.2 - cost of yielding
+The --yield runs so much slower because the cost of yielding is very high and
+the yield forces threads to yield the CPU before they perform addition or
+reduction operations to the counter. It involves many system calls and context
+switch, both of which are very time consuming. The addition time is mainly
+going to the expensive context switch. I think it is not possible to get valid
+per-operation timings if we are using the --yield option. Because we have
+included context switch in the running time and it is quite hard to tell the
+behavior of the threads. They may perform various operations such as context
+switches, addition and reduction to the counters or simply be blocked. The
+timings are hard to show valid per-operation timings.
+
+QUESTION 2.1.3 - measurement errors
+The average cost per operation drop with increasing iterations because the cost
+of creating threads is amortized due to the large number or iterations. With
+small number of iterations, the time of creating threads dominates and the 
+average cost per operation is high. While increasing iterations, the time of
+creating threads become less and less important and the program will perform
+more operations such as addition. Thus , the average cost per operation will
+be lower. To get the "correct" cost, we can select a large number of iterations
+that can still make time be measurable. Like limit theorem, the cost computed
+by the increasing number of iterations is about to converge to be "correct".
+
+QUESTION 2.1.4 - costs of serialization
+All of the options perform similarly for low numbers of threads mainly due to
+the application of multiple CPU (multicore). With a low number of threads, they
+are able to run simultaneously and each thread even own the CPU for itself.
+Hence, they do not need to wait for each other and the lock is not used. This
+makes all of the options perform similarly for a low enough number of threads.
+The three protected operations slow down as the number of threads rises due to
+the memory contection. It needs to have exclusive use of CPU to update the 
+corresponding variables. For instance, the two cores of CPU, each using 
+different L1 and L2 cache while sharing L3 cache, will compete with each other
+for exclusively using a variable. The situation of memory contetion gets worse
+with the rising of number of threads.
+
+QUESTION 2.2.1 - scalability of Mutex
+From the graphs, we can see that the time per mutex-protected operation is 
+increasing as the number of threads increases. This is because the situation of
+memory contetion gets worse as the number of threads increases.
+Although the general trending is similar, they have difference in the rates.
+For add, the time per mutex-protected operation is likely to converge. However,
+for list, the time per mutex-protected operation is increasing almost linearly.
+The reason behind this is that the critical section is quite small for addtion.
+An addition operation is simple and the time per mutex-protected operation will
+tend to reach the equilibrium point as the number of threads increases. 
+However, for list, the critical section is large. We hold lock for various
+operations such as deletion in the list. So as the number of threads increases,
+the time per mutex-protected is correspondingly increasing due to the increase
+of number of waiting threads.
+
+QUESTION 2.2.2 -scalability of spin locks
+From the graphs for Mutex vs Spin locks, we can see that the time per protected
+operation is increasing as the number of threads increases. This is because
+the contetion gets worse due to the rising of the number of threads. There
+exist differences between Mutex and Spin locks. Becuase for mutex, the thread
+is blocked in required situations. For spin lock, the threads are spin waiting.
+For spin lock, the threads can get the lock after the lock is released without 
+making system calls. And, due to the critical sections, we can not get much 
+better performance for mutex. So there are cases, mutex is more efficient and
+there are cases spin lock is more eddicient.
