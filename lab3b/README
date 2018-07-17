@@ -1,0 +1,8 @@
+NAME: Zhonglin Zhang,Zixuan Wang
+EMAIL: evanzhang@ucla.edu,zixuan14@g.ucla.edu
+
+
+descriptions:
+lab3b.py: a python source module to report inconsistencies found in a csv file
+Makefile: support three features: default, dist, clean
+README: personal information and file descriptions
