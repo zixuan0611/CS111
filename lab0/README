@@ -1,0 +1,49 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+ID: 304546929
+
+A description of the included files:
+
+lab0.c : a single C module that compiles cleanly.
+The lab0.c basically copies the standard input (read from file descriptor 0)
+to the standard output (write to file descriptor 1).
+The c source code supports four types of arguments:
+input, output, segfault, catch.
+
+Makefile: used to build the program and make the tarball.
+The Makefile basically builds the executable lab0, runs the smoke-test cases,
+makes the tarball to submit, and clean the files created by the Makefile.
+
+backtrace.png: a screen snapshot to show a segfault and the associated stack
+backtrace. (run with the --segfault argument)
+
+breakpoint.png: a screen snapshot to show a breakpoint and variable check.
+(run with the --segfault argument and check the pointer related to segfault)
+
+The smoke-test cases:
+I mainly run the following six tests:
+inputTest outputTest SegfaultTest catchTest falseArg diffTest exit0Test
+
+inputTest: to check whether the program can exit with the correct code if an
+           input error occurred.
+
+outputTest: to check whether the program can exit with the correct code if an
+            output error occurred.
+
+SegfaultTest: to check whether the program can successfully force a 
+              segmentation fault with the segfault argument.
+
+catchTest: to check whether the program can exit with the correct code if the
+           segmentation fault is caught.
+
+falseArg: to check whether the program can exit with the correct code if there
+          exists unrecognized arguments.
+
+diffTest: to check whether the program can successfully copy the input to the
+          output when no error occurs.
+
+exit0Test: to check whether the program can exit with the correct code if no
+           error occurs.
+
+For the lab assignment, I read man pages and the code from the discussion
+for help. Besides, I used -g option in Makefile.
