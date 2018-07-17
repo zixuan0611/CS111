@@ -4,10 +4,10 @@ default:
 	gcc -Wall -Wextra -g lab0.c -o lab0
 
 dist:
-	tar -czf lab0-304546929.tar.gz lab0.c Makefile backtrace.png breakpoint.png README
+	tar -czf lab0.tar.gz lab0.c Makefile backtrace.png breakpoint.png README
 
 clean:
-	rm -f lab0 lab0-304546929.tar.gz
+	rm -f lab0 lab0.tar.gz
 
 check: default inputTest outputTest SegfaultTest catchTest falseArg diffTest exit0Test
 
