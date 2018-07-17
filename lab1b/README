@@ -1,0 +1,13 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+ID: 304546929
+
+SLIPDAYS: 1 day
+
+lab1b-client.c: a C source module of client implementation.
+lab1b-server.c: a C source module of server implementation.
+Makefile: to compile the two C file and create executables.
+README: Personal information and basic description.
+
+Unfortunately, I cannot make the shell work properly although I have tried
+my best to work on it.
