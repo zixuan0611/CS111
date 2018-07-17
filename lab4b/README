@@ -1,0 +1,13 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+
+COMMENTS: For the provided sanity check script, it is hanging when testing
+          input from pipe_test. But it can passes the sanity check if I
+	  press the button a short time after the hanging. The program works
+	  well when I manually test it by myself.
+
+descriptions of each of the included files:
+lab4b.c: a C source file for an embedded application that builds and runs 
+(with no errors or warnings) on an embedded system.
+Makefile: support four features--default, check, clean, and dist.
+README: related information for this assignment.
