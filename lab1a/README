@@ -1,0 +1,17 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+
+lab1a.c :
+This is a single C source module that performs terminal I/O and
+Inter-Process Communication. I defined several global variables
+and some functions to use. I set up a global variable: shell_flag,
+which is essential for many parts of the implementation, especially
+in main function. 
+
+Makefile:
+This is a Makefile that supports three options: default, clean, dist.
+It is basically used to compiled the program.
+
+READMEL
+This is a README file that contains some brief descriptions for the files
+submitted and my personal information.
