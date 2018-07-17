@@ -1,0 +1,18 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+
+My Beaglebone:
+serial number: BBGW17052171
+the Wifi MAC address: 2c:f7:f1:06:68:15
+MAC: 2CF7F1066815
+
+A description of the included files:
+my_beaglebone.jpg: a selfie of me holding my beaglebone.
+connected.png: a screen shot of the name of my beaglebone and configured
+network access. (running command hostname and ifconfig)
+copy.png: a screen shot of the command scp to transfer the program to
+my beaglebone.
+build_run.png: a screen shot of the compilation and execution for my program.
+git.png: a screen shot of installing git and cloning my github repository.
+README: personal information, my beaglebone information, and description
+of the included files.
