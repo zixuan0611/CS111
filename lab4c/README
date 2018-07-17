@@ -1,0 +1,8 @@
+NAME: Zixuan Wang
+EMAIL: zixuan14@g.ucla.edu
+
+Description:
+lab4c_tcp.c: a C source file to enable TCP connection
+lab4c_tls.c: a C source file to enable TLS connection
+Makefile: supports three features - default, clean, dist
+README: personal information and file descriptions
