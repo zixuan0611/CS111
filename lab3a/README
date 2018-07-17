@@ -1,0 +1,33 @@
+# NAME: Zhonglin Zhang,Zixuan Wang
+# EMAIL: evanzhang@ucla.edu,zixuan14@g.ucla.edu
+
+
+Project 3A
+
+Include files:
+> lab3a.c: the source file to print out a summary of a file system
+
+> ext2_fs.h: the header file that defines the format of the EXT2 file system
+
+> Makefile: for build, generate tarball and clear files
+
+> README: personal information and the descriptions of the files
+
+
+make default: build the executable file
+make dist: generate tarball 
+make clean: clear the generated files
+
+Concerns:
+While sanity checking our program on SEASNET, the cmp command reports "EOF on TEST",
+indicating that there exits a difference regarding with EOF. However, when we compare our
+output with the provided summary "GOLDEN.csv", we do not find any difference between them.
+
+* Update *
+On Wednesday, we asked TA to help us solve the above problem and found that we didn't use the correct OUTPUT file before. There existed difference between our output and the GOLDEN result in fact. So we then modified our code and the new file can pass the sanity check. Hence, we want to use two slip days to re-submit the files of project 3A. 
+
+
+Resources:
+1. http://man7.org/linux/man-pages/man2/pread.2.html
+2. http://www.nongnu.org/ext2-doc/ext2.html
+3. https://elixir.bootlin.com/linux/v4.6/source/fs/ext2/ext2.h
